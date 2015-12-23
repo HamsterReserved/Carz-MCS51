@@ -20,7 +20,7 @@ bit  is_new_msg = 0; // ÊÇ·ñÒÑ½«´Ë´ÎµÄĞÅÏ¢´«µİ¸øÂí´ï£¬µ±ÒÑ¾­´«ËÍÊ±²»ÔÙ´¦Àíbuf¡£Ô
 /* ´®¿Ú½ÓÊÕ»º³åÇø */
 unsigned char buf[5];
 
-/* PWMÕ¼¿Õ±È£¬×¢ÒâÔÚÉÏ½ÅÎª0Ê±´ËÖµÔ½´ó±íÊ¾ËÙ¶ÈÔ½¿ì£¨µ¹³µ£©£¬ÉÏ½ÅÎª1Ê±´ËÖµÔ½´óÔ½Âı */
+/* PWMÕ¼¿Õ±È£¬ÈÎºÎÇé¿öÏÂÔ½´óÔ½¿ì */
 #define PWM_VALUE_MAX 127
 unsigned char pwm_left_front;
 unsigned char pwm_left_rear;
@@ -105,22 +105,16 @@ void set_motor_state(motor_type motor_id, char speed_pwm)
 	0ÔÚÕâÀïÊÇ¸öÀıÍâ£ºËÙ¶È0Ê±directionºÍpwm¶¼ÒªÊÇ0£¬ÕıÏòĞı×ªµÄÆäËûÊ±ºò¶¼ÊÇ1¡¢È¡·´
 	¹Ê°Ñ0ËÙ¶È¹éÎª0x80£¬Ê¹Æä²ÉÓÃ¸ºÊı¼ÆËã·½·¨À´¼ò»¯Âß¼­
 	*/
-	if (speed_pwm == 0)
-		speed_pwm = 0x80;
-
-	/* Õı×ªÊ±PWMÖµÔ½´óËÙ¶ÈÔ½Âı£¬·´×ªÊ±PWMÔ½´óËÙ¶ÈÔ½¿ì */
-	if (speed_pwm & 0x80) // È¡·ûºÅÎ»
-	{
-		// ·ûºÅÎ»Îª1£¬·´ÏòĞı×ª£¨»ò£¨¾ÀÕıºóµÄ£©Í£Ö¹£©
-		real_pwm_state = speed_pwm & 0x7f; // È¥µô·ûºÅ
+	if (speed_pwm == 0) {
+		real_pwm_state = 0;
 		direction = 0;
+		goto zero_rule;
 	}
-	else
-	{
-		// ·ûºÅÎ»Îª0£¬ ÕıÏòĞı×ª
-		real_pwm_state = PWM_VALUE_MAX - speed_pwm;
-		direction = 1;
-	}
+
+	real_pwm_state = PWM_VALUE_MAX - speed_pwm & 0x7f;
+	direction = !(speed_pwm & 0x80);
+
+zero_rule:
 #ifdef DEBUG
 	sprintf(msg_buf, "SSTC %x %x\r\n", direction, real_pwm_state);
 	send_str(msg_buf);
