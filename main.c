@@ -10,7 +10,7 @@
 
 //#define DEBUG
 
-#include <AT89x51.H>
+#include <AT89X52.H>
 #ifdef DEBUG
 #include <stdio.h>
 #endif
@@ -180,8 +180,8 @@ void serial_int()
 interrupt 4	  //串口中断
 #endif
 {
-	unsigned int recv_buf = 0;
-	static unsigned int bytes_received = 0; // 非0表明已开始接收
+	unsigned char recv_buf = 0;
+	static unsigned char bytes_received = 0; // 非0表明已开始接收
 
 	if (RI) //是否接收中断
 	{
@@ -208,6 +208,35 @@ interrupt 4	  //串口中断
 		}
 	}
 }
+
+/* 串口初始化函数 */
+void serial_init()
+{
+	/* 使用T2做波特率发生器，11.0592MHz，9600 */
+	RCLK = 1;
+	TCLK = 1;
+	RCAP2H = 0xFF;
+	RCAP2L = 0xDC;
+	/* 串口方式1，8-N-1 */
+	SCON = 0x50;
+	PCON = 0;
+	/* 允许串口中断，T2开始工作 */
+	ES = 1;
+	TR2 = 1;
+}
+
+/* PWM时钟初始化函数 */
+void pwm_init()
+{
+	/* 使用T0作为PWM时钟，方式2，自动重装0x9c（156us，6410次中断/秒） */
+	TMOD = (TMOD & T1_MASK_) | 0x02; // T1保留
+	TH0 = 0x9c;
+	TL0 = 0x9c;
+	/* 允许中断，开始工作 */
+	ET0 = 1;
+	TR0 = 1;
+}
+
 /*********************************************************************/
 /*--主函数--*/
 void main(void)
@@ -215,28 +244,17 @@ void main(void)
 #ifdef DEBUG
 	char msg_buf[15];
 #endif
-
-	TMOD = 0x22; // T1方式2，自动重装0xfd，用于串口波特率。T0方式2，自动重装0x9c（156us，6410次中断/秒）用于PWM模拟
-	TH0 = 0x9c;
-	TL0 = 0x9c;
-	TH1 = 0xfd; //11.0592M晶振，9600波特率
-	TL1 = 0xfd;
-	SCON = 0x50; // 串口方式1，9600-8-N-1
-	PCON = 0x00; // 波特率不加倍
-	TR1 = 1;
-	TR0 = 1;
-	ES = 1;
-	ET0 = 1;
+	serial_init();
+	pwm_init();
 	EA = 1;
-
-	P1 = 0;
+	P1 = 0; // 程序以P1=0为始态
 
 	while (1)
 	{
 		if (is_new_msg == 1)
 		{
 			is_new_msg = 0;
-			if (buf[0] == 'H' && buf[1] == 'S')	//第一个字节为H，第二个字节为S，后两个字节为控制码
+			if (buf[0] == 'H' && buf[1] == 'S')	//第一个字节为H，第二个字节为S，后两个字节为控制字
 			{
 				// 暂时把一侧的电机设置为同一个PWM值
 #ifdef DEBUG
