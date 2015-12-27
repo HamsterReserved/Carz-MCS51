@@ -221,7 +221,7 @@ void main(void)
 	TL0 = 0x9c;
 	TH1 = 0xfd; //11.0592M晶振，9600波特率
 	TL1 = 0xfd;
-	SCON = 0x50; // 串口方式2，9600-8-1Start-1Programmable-1Stop
+	SCON = 0x50; // 串口方式1，9600-8-N-1
 	PCON = 0x00; // 波特率不加倍
 	TR1 = 1;
 	TR0 = 1;
