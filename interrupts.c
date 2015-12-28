@@ -7,6 +7,7 @@
 void t0_int()
 #ifndef WIN32
 interrupt 1
+using 2
 #endif
 {
 	t0_pwm_interrupt();
@@ -15,6 +16,7 @@ interrupt 1
 void serial_int()
 #ifndef WIN32
 interrupt 4	  //´®¿ÚÖĞ¶Ï
+using 2
 #endif
 {
 	bt_serial_recv_interrupt();

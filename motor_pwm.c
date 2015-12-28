@@ -76,6 +76,9 @@ zero_rule:
 6410次中断/秒，tick 127次为一个PWM循环
 */
 void t0_pwm_interrupt()
+#ifndef WIN32
+using 2
+#endif
 {
 	static int current_pwm_tick = 0;
 
