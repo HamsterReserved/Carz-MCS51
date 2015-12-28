@@ -4,5 +4,5 @@
 #include "config.h"
 
 void serial_init();
-
+void serial_loop();
 #endif

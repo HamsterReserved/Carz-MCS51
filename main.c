@@ -17,12 +17,6 @@
 #include <stdio.h>
 #endif
 
-/* bt_serial.c */
-/* 串口接收缓冲区 */
-extern unsigned char buf[5];
-/* 新信息到达标志 */
-extern bit is_new_msg;
-
 /*--主函数--*/
 void main(void)
 {
@@ -36,21 +30,6 @@ void main(void)
 
 	while (1)
 	{
-		if (is_new_msg == 1)
-		{
-			is_new_msg = 0;
-			if (buf[0] == 'H' && buf[1] == 'S')	//第一个字节为H，第二个字节为S，后两个字节为控制字
-			{
-				// 暂时把一侧的电机设置为同一个PWM值
-#ifdef DEBUG
-				sprintf(msg_buf, "\r\nMSG %x %x\r\n", buf[2], buf[3]);
-				send_str(msg_buf);
-#endif
-				set_motor_state(MOTOR_LEFT_FRONT, buf[2]);
-				set_motor_state(MOTOR_LEFT_REAR, buf[2]);
-				set_motor_state(MOTOR_RIGHT_FRONT, buf[3]);
-				set_motor_state(MOTOR_RIGHT_REAR, buf[3]);
-			}
-		}
+		serial_loop();
 	}
 }

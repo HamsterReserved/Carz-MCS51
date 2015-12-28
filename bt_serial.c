@@ -1,5 +1,6 @@
 #include <AT89X52.h>
 #include "config.h"
+#include "motor_pwm.h"
 
 /* 串口接收缓冲区 */
 unsigned char buf[5];
@@ -55,4 +56,25 @@ void serial_init()
 	/* 允许串口中断，T2开始工作 */
 	ES = 1;
 	TR2 = 1;
+}
+
+/* 相当于main中loop的部分，循环执行 */
+void serial_loop()
+{
+	if (is_new_msg == 1)
+	{
+		is_new_msg = 0;
+		if (buf[0] == 'H' && buf[1] == 'S')	//第一个字节为H，第二个字节为S，后两个字节为控制字
+		{
+			// 暂时把一侧的电机设置为同一个PWM值
+#ifdef DEBUG
+			sprintf(msg_buf, "\r\nMSG %x %x\r\n", buf[2], buf[3]);
+			send_str(msg_buf);
+#endif
+			set_motor_state(MOTOR_LEFT_FRONT, buf[2]);
+			set_motor_state(MOTOR_LEFT_REAR, buf[2]);
+			set_motor_state(MOTOR_RIGHT_FRONT, buf[3]);
+			set_motor_state(MOTOR_RIGHT_REAR, buf[3]);
+		}
+	}
 }
