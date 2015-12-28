@@ -12,6 +12,9 @@ bit is_new_msg = 0;
 
 /* 串口中断服务程序 */
 void bt_serial_recv_interrupt()
+#ifndef WIN32
+interrupt 4	  //串口中断
+#endif
 {
 	unsigned char recv_buf = 0;
 	static unsigned char bytes_received = 0; // 非0表明已开始接收
