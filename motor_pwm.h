@@ -24,6 +24,7 @@ typedef enum {
 } motor_type;
 
 void set_motor_state(motor_type motor_id, char speed_pwm);
+void t0_pwm_interrupt();
 void pwm_init();
 
 #endif

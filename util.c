@@ -1,3 +1,5 @@
+/* 工具函数 */
+
 #include "config.h"
 
 //延时函数	
@@ -9,19 +11,9 @@ void delay(unsigned int k)
 }
 
 #ifdef DEBUG
-/************************************************************************/
-//字符串发送函数
-void send_str(unsigned char* str_send) {
-	unsigned char i = 0;
-	while (str_send[i] != '\0')
-	{
-		SBUF = str_send[i];
-		while (!TI);				// 等特数据传送
-		TI = 0;					// 清除数据传送标志
-		i++;					// 下一个字符
-	}
-}
+#include "bt_serial.h"
 
+/* 通过蓝牙发送P1（驱动引脚）的情况 */
 void dump_pins()
 {
 	int P1_state = P1;

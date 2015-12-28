@@ -1,3 +1,5 @@
+/* 电机控制与PWM */
+
 #include <AT89X52.h>
 #include "motor_pwm.h"
 #include "config.h"
@@ -73,10 +75,7 @@ zero_rule:
 定为156us，方式2
 6410次中断/秒，tick 127次为一个PWM循环
 */
-void t0_int()
-#ifndef WIN32
-interrupt 1
-#endif
+void t0_pwm_interrupt()
 {
 	static int current_pwm_tick = 0;
 

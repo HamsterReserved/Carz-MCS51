@@ -1,3 +1,5 @@
+/* 蓝牙串口相关 */
+
 #include <AT89X52.h>
 #include "config.h"
 #include "motor_pwm.h"
@@ -8,10 +10,8 @@ unsigned char buf[5];
 /* 新信息到达标志 */
 bit is_new_msg = 0;
 
-void serial_int()
-#ifndef WIN32
-interrupt 4	  //串口中断
-#endif
+/* 串口中断服务程序 */
+void bt_serial_recv_interrupt()
 {
 	unsigned char recv_buf = 0;
 	static unsigned char bytes_received = 0; // 非0表明已开始接收
@@ -56,6 +56,19 @@ void serial_init()
 	/* 允许串口中断，T2开始工作 */
 	ES = 1;
 	TR2 = 1;
+}
+
+/* 字符串发送函数 */
+void send_str(unsigned char* str_send)
+{
+	unsigned char i = 0;
+	while (str_send[i] != '\0')
+	{
+		SBUF = str_send[i];
+		while (!TI);				// 等特数据传送
+		TI = 0;					// 清除数据传送标志
+		i++;					// 下一个字符
+	}
 }
 
 /* 相当于main中loop的部分，循环执行 */
