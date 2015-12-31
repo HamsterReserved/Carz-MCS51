@@ -18,6 +18,7 @@ interrupt 4	  //串口中断
 {
 	unsigned char recv_buf = 0;
 	static unsigned char bytes_received = 0; // 非0表明已开始接收
+	void serial_process();
 
 	if (RI) //是否接收中断
 	{
@@ -37,6 +38,7 @@ interrupt 4	  //串口中断
 				{
 					bytes_received = 0;
 					is_new_msg = 1;
+					serial_process();
 					return;
 				}  // 停止接收
 				bytes_received++;
@@ -74,8 +76,20 @@ void send_str(unsigned char* str_send)
 	}
 }
 
+void send_data(unsigned char* array_data, unsigned char len)
+{
+	unsigned char i = 0;
+	while (i < len)
+	{
+		SBUF = array_data[i];
+		while (!TI);				// 等特数据传送
+		TI = 0;					// 清除数据传送标志
+		i++;					// 下一个字符
+	}
+}
 /* 相当于main中loop的部分，循环执行 */
-void serial_loop()
+//void serial_loop()
+void serial_process()
 {
 	if (is_new_msg == 1)
 	{

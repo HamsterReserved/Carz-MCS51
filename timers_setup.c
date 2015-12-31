@@ -2,6 +2,7 @@
 #include "config.h"
 #include "motor_pwm.h"
 #include "bt_serial.h"
+#include "distance.h"
 
 void t0_setup()
 {
@@ -10,7 +11,7 @@ void t0_setup()
 
 void t1_setup()
 {
-
+	distance_t1_init();
 }
 
 void t2_setup()

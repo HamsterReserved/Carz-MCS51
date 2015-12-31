@@ -3,6 +3,7 @@
 #include "motor_pwm.h"
 #include "bt_serial.h"
 #include "timers_setup.h"
+#include "distance.h"
 
 #ifdef DEBUG
 #include <stdio.h>
@@ -22,6 +23,6 @@ void main(void)
 
 	while (1)
 	{
-		serial_loop();
+		distance_loop();
 	}
 }
